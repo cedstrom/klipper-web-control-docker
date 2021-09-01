@@ -12,6 +12,7 @@ services:
     container_name: klipper
     ports:
       - 7125:7125
+      - 5555:5555
     restart: unless-stopped
     volumes:
       - gcode_files:/home/klippy/gcode_files

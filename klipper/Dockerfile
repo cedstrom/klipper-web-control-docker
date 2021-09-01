@@ -9,7 +9,7 @@ ARG MOONRAKER_VENV_DIR=${HOME}/moonraker-env
 
 RUN useradd -d ${HOME} -ms /bin/bash ${USER}
 RUN apt-get update && \
-    apt-get install -y locales git sudo wget curl gzip tar python-virtualenv virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod liblmdb0 libsodium-dev
+    apt-get install -y locales git sudo wget curl gzip tar virtualenv python-dev libffi-dev libncurses-dev libusb-dev gpiod python3-virtualenv python3-dev libopenjp2-7 python3-libgpiod liblmdb0 libsodium-dev python2.7
 RUN sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen
 RUN locale-gen
 
@@ -24,7 +24,7 @@ WORKDIR ${HOME}
 RUN git clone https://github.com/KevinOConnor/klipper.git
 RUN sed -i 's/0.4.15/0.4.17/g' klipper/scripts/klippy-requirements.txt
 RUN sed -i 's/1.12.2/1.12.3/g' klipper/scripts/klippy-requirements.txt
-RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv ${KLIPPER_VENV_DIR}
+RUN [ ! -d ${KLIPPER_VENV_DIR} ] && virtualenv -p python27 ${KLIPPER_VENV_DIR}
 RUN ${KLIPPER_VENV_DIR}/bin/python -m pip install pip -U
 RUN ${KLIPPER_VENV_DIR}/bin/pip install wheel
 RUN ${KLIPPER_VENV_DIR}/bin/pip install -r klipper/scripts/klippy-requirements.txt
@@ -56,6 +56,8 @@ RUN apt-get update && \
     liblmdb0 \
     libsodium-dev \
     zlib1g-dev \
+    socat \
+    python2.7 \
     python3-libgpiod && \
     sed -i -e 's/# en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen && \
@@ -99,6 +101,7 @@ VOLUME ${HOME}/gcode_files
 VOLUME ${CONFIG_DIR}
 
 EXPOSE 7125
+EXPOSE 5555
 
 USER root
 

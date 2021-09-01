@@ -104,6 +104,37 @@ After build run ```docker-compose up -d``` and see if it works.
 - automatic updates for the frontend (update the container with ```docker-compose pull``` instead)
 - CI pipeline to build images as upstream repos change
 
+## Virtual serial port
+  The klipper container exports a virtual serial port on port 5555 so it can easily be interfaced with an external OctoPrint instance via socat:
+```socat pty,rawer,link=/tmp/printer TCP4-CONNECT:localhost:5555 ```
+
+You can start this tunnel automatically by adding a systemd service:
+In file `/etc/systemd/system/socat-serial-tcp.service`:
+```
+[Unit]
+Description=Socat Serial Net Transport
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=socat-serial-tcp
+
+ExecStart=socat pty,rawer,link=/tmp/printer TCP4-CONNECT:localhost:5555
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+then at the prompt:
+```
+$ sudo systemctl sudo systemctl daemon-reload
+$ sudo systemctl enable socat-serial-tcp
+$ sudo systemctl start socat-serial-tcp
+```
+
 ## Credits
 - where I found some of the macros
   - [https://github.com/fl0r1s/klipper_config](https://github.com/fl0r1s/klipper_config)
